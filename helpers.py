@@ -19,20 +19,22 @@ def softmax(z):
     e = np.exp(z - z.max(axis=1, keepdims=True))
     return e / e.sum(axis=1, keepdims=True)
 
-# loss (categorical cross-entropy, used during training)
-def loss(y, l):
+# categorical cross-entropy
+def categorical_cross_entropy(y, l):
     l = np.clip(l, 1e-15, 1 - 1e-15)
     log_l = np.log(l)
     total_error = np.sum(y * log_l)
     return -total_error / len(y)
 
-# accuracy (fraction of correctly classified samples)
+# accuracy
 def accuracy(y, l):
     predicted_class = np.argmax(l, axis=1)
     true_class = np.argmax(y, axis=1)
-    return np.mean(predicted_class == true_class)
+    correct_predictions = np.sum(predicted_class == true_class)
+    total_predictions = len(y)
+    return correct_predictions / total_predictions
 
-# binary cross-entropy error (used to evaluate the prediction, per the subject formula)
+# binary cross-entropy error
 def binary_cross_entropy(y, p):
     p = np.clip(p, 1e-15, 1 - 1e-15)
     total_error = np.sum((y * np.log(p)) + (1 - y) * np.log(1 - p))
