@@ -1,16 +1,31 @@
 import sys
 import json
+import argparse
 import numpy as np
 import matplotlib.pyplot as plt
 import helpers
 
+def parse_args():
+    parser = argparse.ArgumentParser(description='Train a multilayer perceptron.')
+    parser.add_argument('--dataset', type=str, default='data_train.csv',
+                         help='path to the training dataset')
+    parser.add_argument('--val_dataset', type=str, default='data_valid.csv',
+                         help='path to the validation dataset')
+    parser.add_argument('--layer', type=int, nargs='+', default=[24, 24],
+                         help='sizes of the hidden layers (at least 2 required, default [24, 24])')
+    parser.add_argument('--epochs', type=int, default=100)
+    parser.add_argument('--loss', type=str, default='categoricalCrossentropy',
+                         choices=['categoricalCrossentropy'])
+    parser.add_argument('--batch_size', type=int, default=8)
+    parser.add_argument('--learning_rate', type=float, default=0.01)
+    return parser.parse_args()
+
 def main():
-    with open('config.json') as f:
-        config = json.load(f)
+    args = parse_args()
 
     # load data
-    x_train, y_train = helpers.load('data_train.csv')
-    x_valid, y_valid = helpers.load('data_valid.csv')
+    x_train, y_train = helpers.load(args.dataset)
+    x_valid, y_valid = helpers.load(args.val_dataset)
 
     print('x_train shape :', x_train.shape)
     print('x_valid shape :', x_valid.shape)
@@ -24,8 +39,14 @@ def main():
     y_train = np.array([[1, 0] if v == 'B' else [0, 1] for v in y_train])
     y_valid = np.array([[1, 0] if v == 'B' else [0, 1] for v in y_valid])
 
-    # init weights
-    sizes = config['sizes'] #30 input features -> hidden layer of 24 neurons -> hidden layer of 24 neurons -> output layer of 2 neurons
+    # init weights: input size from the data, output fixed at 2 classes,
+    # hidden layers configurable via --layer (at least 2 required, default [24, 24])
+    hidden_layers = args.layer
+    if len(hidden_layers) < 2:
+        print('Warning: at least 2 hidden layers are required, using default [24, 24]')
+        hidden_layers = [24, 24]
+
+    sizes = [x_train.shape[1]] + hidden_layers + [2]
     rng = np.random.default_rng(0)
 
     for i in range(len(sizes) - 1):
@@ -36,9 +57,9 @@ def main():
         helpers.biases.append(b)
 
     # train loop
-    learning_rate = config['learning_rate']
-    epochs = config['epochs']
-    batch_size = config['batch_size']
+    learning_rate = args.learning_rate
+    epochs = args.epochs
+    batch_size = args.batch_size
 
     loss_history = []
     val_loss_history = []
