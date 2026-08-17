@@ -66,6 +66,11 @@ def main():
     acc_history = []
     val_acc_history = []
 
+    # bonus: early stopping
+    patience = 10
+    best_val_loss = np.inf
+    epochs_without_improvement = 0
+
     for epoch in range(epochs):
         for start in range(0, len(x_train), batch_size):
             x_batch = x_train[start:start + batch_size]
@@ -88,6 +93,17 @@ def main():
         val_acc_history.append(val_acc)
 
         print('epoch %03d - loss: %.4f - val_loss: %.4f' % (epoch + 1, train_loss, val_loss))
+
+        # bonus: early stopping
+        if val_loss < best_val_loss:
+            best_val_loss = val_loss
+            epochs_without_improvement = 0
+        else:
+            epochs_without_improvement += 1
+
+        if epochs_without_improvement >= patience:
+            print('early stopping: no improvement in val_loss for %d epochs' % patience)
+            break
 
     # save model
     np.save('saved_model.npy', {
