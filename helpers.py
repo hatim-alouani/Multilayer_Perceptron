@@ -11,8 +11,8 @@ def load(path):
     return x, y
 
 # activations
-def sigmoid(z):
-    return 1 / (1 + np.exp(-z))
+def relu(z):
+    return np.maximum(0, z)
 
 def softmax(z):
     e = np.exp(z - z.max(axis=1, keepdims=True))
@@ -38,7 +38,7 @@ def forward(x):
         if i == len(weights) - 1:
             l = softmax(z)
         else:
-            l = sigmoid(z)
+            l = relu(z)
         l_list.append(l)
     return l, l_list
 
@@ -55,7 +55,7 @@ def backward(x, y, l_list):
         dW.insert(0, dw)
         db.insert(0, dbias)
         if i > 0:
-            delta = (delta @ weights[i].T) * l_list[i] * (1 - l_list[i])
+            delta = (delta @ weights[i].T) * (l_list[i] > 0)
 
     return dW, db
 

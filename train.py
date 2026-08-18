@@ -5,13 +5,13 @@ import numpy as np
 import matplotlib.pyplot as plt
 import helpers
 
+VAL_DATASET = 'data_valid.csv'
+
 # parse arguments
 def parse_args():
     parser = argparse.ArgumentParser(description='Train a multilayer perceptron.')
     parser.add_argument('--dataset', type=str, default='data_train.csv',
                          help='path to the training dataset')
-    parser.add_argument('--val_dataset', type=str, default='data_valid.csv',
-                         help='path to the validation dataset')
     parser.add_argument('--layer', type=int, nargs='+', default=[24, 24],
                          help='sizes of the hidden layers (at least 2 required, default [24, 24])')
     parser.add_argument('--epochs', type=int, default=100)
@@ -26,7 +26,7 @@ def main():
 
     # load data
     x_train, y_train = helpers.load(args.dataset)
-    x_valid, y_valid = helpers.load(args.val_dataset)
+    x_valid, y_valid = helpers.load(VAL_DATASET)
 
     print('x_train shape :', x_train.shape)
     print('x_valid shape :', x_valid.shape)
