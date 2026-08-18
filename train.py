@@ -5,6 +5,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import helpers
 
+# parse arguments
 def parse_args():
     parser = argparse.ArgumentParser(description='Train a multilayer perceptron.')
     parser.add_argument('--dataset', type=str, default='data_train.csv',
@@ -39,8 +40,7 @@ def main():
     y_train = np.array([[1, 0] if v == 'B' else [0, 1] for v in y_train])
     y_valid = np.array([[1, 0] if v == 'B' else [0, 1] for v in y_valid])
 
-    # init weights: input size from the data, output fixed at 2 classes,
-    # hidden layers configurable via --layer (at least 2 required, default [24, 24])
+    # init weights
     hidden_layers = args.layer
     if len(hidden_layers) < 2:
         print('Warning: at least 2 hidden layers are required, using default [24, 24]')
@@ -66,7 +66,7 @@ def main():
     acc_history = []
     val_acc_history = []
 
-    # bonus: early stopping
+    # early stopping
     patience = 10
     best_val_loss = np.inf
     epochs_without_improvement = 0
@@ -94,7 +94,7 @@ def main():
 
         print('epoch %03d - loss: %.4f - val_loss: %.4f' % (epoch + 1, train_loss, val_loss))
 
-        # bonus: early stopping
+        # early stopping
         if val_loss < best_val_loss:
             best_val_loss = val_loss
             epochs_without_improvement = 0
@@ -126,7 +126,7 @@ def main():
         json.dump(history, f)
     print("> saving history './history.json' to disk...")
 
-    # learning curves (mandatory: two graphs displayed at the end of training)
+    # learning curves
     plt.figure()
     plt.plot(history['loss'], label='training loss')
     plt.plot(history['val_loss'], label='validation loss')

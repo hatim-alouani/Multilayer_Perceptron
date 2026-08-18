@@ -4,7 +4,6 @@ import numpy as np
 weights = []
 biases = []
 
-# load data
 def load(path):
     df = pd.read_csv(path, header=None)
     x = df.iloc[:, 2:].values.astype(float)
@@ -19,28 +18,18 @@ def softmax(z):
     e = np.exp(z - z.max(axis=1, keepdims=True))
     return e / e.sum(axis=1, keepdims=True)
 
-# categorical cross-entropy
+# loss functions
 def categorical_cross_entropy(y, l):
     l = np.clip(l, 1e-15, 1 - 1e-15)
     log_l = np.log(l)
     total_error = np.sum(y * log_l)
     return -total_error / len(y)
 
-# accuracy
-def accuracy(y, l):
-    predicted_class = np.argmax(l, axis=1)
-    true_class = np.argmax(y, axis=1)
-    correct_predictions = np.sum(predicted_class == true_class)
-    total_predictions = len(y)
-    return correct_predictions / total_predictions
-
-# binary cross-entropy error
 def binary_cross_entropy(y, p):
     p = np.clip(p, 1e-15, 1 - 1e-15)
     total_error = np.sum((y * np.log(p)) + (1 - y) * np.log(1 - p))
     return -total_error / len(y)
 
-# forward
 def forward(x):
     l = x
     l_list = [x]
@@ -53,7 +42,6 @@ def forward(x):
         l_list.append(l)
     return l, l_list
 
-# backward
 def backward(x, y, l_list):
     m = len(x)
     dW = []
@@ -71,9 +59,15 @@ def backward(x, y, l_list):
 
     return dW, db
 
-# gradient descent
 def gradient_descent(weights, biases, dW, db, learning_rate):
     for i in range(len(weights)):
         weights[i] = weights[i] - learning_rate * dW[i]
         biases[i]  = biases[i]  - learning_rate * db[i]
     return weights, biases
+
+def accuracy(y, l):
+    predicted_class = np.argmax(l, axis=1)
+    true_class = np.argmax(y, axis=1)
+    correct_predictions = np.sum(predicted_class == true_class)
+    total_predictions = len(y)
+    return correct_predictions / total_predictions
